@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Large dataset files (download from Kaggle)
+data/
+
+# Deprecated
+models_labfree/
+
+# Next.js
+web/node_modules/
+web/.next/
+web/out/
+
+# Environment files (contain API keys)
+.env
+.env.local
+.env*.local
+web/.env.local
+web/.env*.local
+
+# API
+api/__pycache__/
+
+# Gemini / IDE agents
+.gemini/
+.agents/
