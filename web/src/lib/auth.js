@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
   signOut as firebaseSignOut,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -46,8 +46,8 @@ export function AuthProvider({ children }) {
     }
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      return result.user;
+      await signInWithRedirect(auth, provider);
+      return null;
     } catch (error) {
       console.error("Google sign-in error:", error);
       throw error;

@@ -20,7 +20,7 @@ export default function Navbar() {
   const handleSignIn = async () => {
     try {
       await signInWithGoogle();
-      router.push("/dashboard");
+      // Will redirect to Google and back
     } catch (e) {
       console.error("Sign-in failed:", e);
     }
