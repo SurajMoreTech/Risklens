@@ -714,6 +714,28 @@ a:hover {
   font-size: 0.75rem;
 }
 
+.footer-contact {
+  margin-top: 0.25rem;
+}
+
+.footer-contact h4 {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+}
+
+.footer-contact p {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0.15rem 0;
+}
+
+.footer-contact a:hover {
+  text-decoration: underline !important;
+}
+
 /* ── Assessment Form ───────────────────────────────────────── */
 .form-section {
   max-width: 720px;

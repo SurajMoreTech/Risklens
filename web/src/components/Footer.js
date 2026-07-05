@@ -13,6 +13,15 @@ export default function Footer() {
             should not replace professional medical advice.
           </p>
         </div>
+        <div className="footer-contact">
+          <h4>Contact</h4>
+          <p><strong>Suraj More</strong></p>
+          <p>
+            <a href="mailto:surajm80226@gmail.com" style={{ color: "var(--accent-teal)", textDecoration: "none" }}>
+              surajm80226@gmail.com
+            </a>
+          </p>
+        </div>
         <div className="footer-disclaimer">
           Built with Next.js · FastAPI · XGBoost · SHAP
         </div>
