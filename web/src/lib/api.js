@@ -1,15 +1,32 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function predictRisk(inputs) {
-  const response = await fetch(`${API_BASE}/api/predict`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(inputs),
-  });
+  console.log("[RiskLens API] POST /api/predict →", API_BASE);
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE}/api/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(inputs),
+    });
+  } catch (networkError) {
+    console.error("[RiskLens API] Network error:", networkError);
+    throw new Error(
+      "Cannot reach the prediction server. Make sure the API is running."
+    );
+  }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || "Prediction failed");
+    let detail = `HTTP ${response.status}`;
+    try {
+      const errorBody = await response.json();
+      detail = errorBody.detail || JSON.stringify(errorBody);
+    } catch {
+      // couldn't parse error body
+    }
+    console.error("[RiskLens API] Error response:", detail);
+    throw new Error(detail);
   }
 
   return response.json();

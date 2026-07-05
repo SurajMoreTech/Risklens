@@ -22,7 +22,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   doc,
   setDoc,
   getDoc,
@@ -169,17 +168,20 @@ export async function getDashboardHistory(userId) {
   }
 
   try {
+    // Use a simple query (no orderBy) to avoid needing a composite index.
+    // We sort client-side instead — works immediately with zero Firebase setup.
     const q = query(
       collection(db, "assessments"),
-      where("userId", "==", userId),
-      orderBy("timestamp", "desc")
+      where("userId", "==", userId)
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((d) => ({
+    const results = snapshot.docs.map((d) => ({
       id: d.id,
       ...d.data(),
       timestamp: d.data().timestamp?.toDate?.() || new Date(),
     }));
+    // Sort client-side (newest first)
+    return results.sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {
     console.error("[dashboard-store] getDashboardHistory failed:", error);
     throw error;

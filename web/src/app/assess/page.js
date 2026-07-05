@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
@@ -323,7 +323,19 @@ function AssessmentContent() {
     }
   };
 
+  // ── Refs to coordinate API completion + animation completion ──
+  const apiDoneRef = useRef(false);
+  const animDoneRef = useRef(false);
+
+  const tryNavigate = useCallback(() => {
+    if (apiDoneRef.current && animDoneRef.current) {
+      router.push("/results");
+    }
+  }, [router]);
+
   const handlePredict = useCallback(async () => {
+    apiDoneRef.current = false;
+    animDoneRef.current = false;
     setLoading(true);
     setStep("loading");
 
@@ -342,7 +354,9 @@ function AssessmentContent() {
         }
       });
 
+      console.log("[RiskLens] Sending prediction payload:", JSON.stringify(fullAnswers));
       const result = await predictRisk(fullAnswers);
+      console.log("[RiskLens] Prediction succeeded:", result.riskScore);
 
       // Save to Firestore via dashboard-store
       let assessmentId = null;
@@ -382,18 +396,24 @@ function AssessmentContent() {
       // Clear assessment progress
       localStorage.removeItem("risklens_assessment");
 
+      // Mark API as done and try to navigate
+      apiDoneRef.current = true;
+      tryNavigate();
+
     } catch (error) {
       console.error("Prediction error:", error);
-      alert("Error getting prediction. Make sure the API server is running on localhost:8000");
+      alert("Error getting prediction. Make sure the API server is running.\n\nDetails: " + error.message);
       setStep("consent");
       setLoading(false);
       return;
     }
-  }, [answers, personal, user]);
+  }, [answers, personal, user, tryNavigate]);
 
   const handleLoadingComplete = useCallback(() => {
-    router.push("/results");
-  }, [router]);
+    // Mark animation as done and try to navigate
+    animDoneRef.current = true;
+    tryNavigate();
+  }, [tryNavigate]);
 
   return (
     <>

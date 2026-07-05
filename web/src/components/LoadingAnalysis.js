@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const STEPS = [
   "Validating your responses...",
@@ -11,6 +11,12 @@ const STEPS = [
 
 export default function LoadingAnalysis({ onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+
+  // Keep the ref fresh without re-triggering the effect
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     const intervals = [800, 1200, 1000, 800];
@@ -25,14 +31,14 @@ export default function LoadingAnalysis({ onComplete }) {
       } else {
         // All steps done
         timeout = setTimeout(() => {
-          if (onComplete) onComplete();
+          if (onCompleteRef.current) onCompleteRef.current();
         }, 500);
       }
     };
 
     runStep(0);
     return () => clearTimeout(timeout);
-  }, [onComplete]);
+  }, []); // Empty deps — runs once, uses ref for callback
 
   return (
     <div className="loading-container">
