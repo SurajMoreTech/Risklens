@@ -2,6 +2,8 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export async function predictRisk(inputs) {
   console.log("[RiskLens API] POST /api/predict →", API_BASE);
+  console.log("[RiskLens API] Payload keys:", Object.keys(inputs).sort());
+  console.log("[RiskLens API] Payload:", JSON.stringify(inputs));
 
   let response;
   try {
