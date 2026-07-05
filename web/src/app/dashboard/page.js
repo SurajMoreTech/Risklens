@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { getUserAssessments } from "@/lib/firestore";
+import { getDashboardHistory, deleteDashboardAssessment, getDashboardStats } from "@/lib/dashboard-store";
 import { downloadReport } from "@/lib/api";
 
 function DashboardContent() {
@@ -30,12 +30,26 @@ function DashboardContent() {
 
   const loadAssessments = async () => {
     try {
-      const data = await getUserAssessments(user.uid);
+      const data = await getDashboardHistory(user.uid);
       setAssessments(data);
     } catch (error) {
       console.error("Error loading assessments:", error);
     } finally {
       setLoadingData(false);
+    }
+  };
+
+  const handleDeleteAssessment = async (assessmentId) => {
+    if (!confirm("Are you sure you want to delete this assessment?")) return;
+    try {
+      await deleteDashboardAssessment(assessmentId);
+      setAssessments((prev) => prev.filter((a) => a.id !== assessmentId));
+      if (selectedAssessment?.id === assessmentId) {
+        setSelectedAssessment(null);
+      }
+    } catch (error) {
+      console.error("Error deleting assessment:", error);
+      alert("Failed to delete assessment.");
     }
   };
 
@@ -79,20 +93,7 @@ function DashboardContent() {
     return "high";
   };
 
-  const getLatestScore = () => {
-    if (assessments.length === 0) return "—";
-    return assessments[0].riskScore;
-  };
-
-  const getScoreTrend = () => {
-    if (assessments.length < 2) return null;
-    const latest = assessments[0].riskScore;
-    const previous = assessments[1].riskScore;
-    const diff = latest - previous;
-    if (diff > 0) return { direction: "up", value: diff, bad: true };
-    if (diff < 0) return { direction: "down", value: Math.abs(diff), bad: false };
-    return { direction: "same", value: 0, bad: false };
-  };
+  const stats = getDashboardStats(assessments);
 
   if (authLoading || !user) {
     return (
@@ -106,7 +107,7 @@ function DashboardContent() {
     );
   }
 
-  const trend = getScoreTrend();
+  const { count, latestScore, trend } = stats;
 
   const FEATURE_LABELS = {
     HighBP: "High Blood Pressure", HighChol: "High Cholesterol",
@@ -153,19 +154,19 @@ function DashboardContent() {
         {/* Stats Cards */}
         <div className="dashboard-stats">
           <div className="card stat-card">
-            <div className="stat-card-value">{assessments.length}</div>
+            <div className="stat-card-value">{count}</div>
             <div className="stat-card-label">Total Assessments</div>
           </div>
           <div className="card stat-card">
             <div
               className="stat-card-value"
               style={{
-                color: assessments.length > 0
-                  ? `var(--risk-${getRiskClass(getLatestScore())})`
+                color: latestScore !== null
+                  ? `var(--risk-${getRiskClass(latestScore)})`
                   : "var(--text-muted)",
               }}
             >
-              {getLatestScore()}
+              {latestScore !== null ? latestScore : "—"}
             </div>
             <div className="stat-card-label">Latest Score</div>
           </div>
@@ -282,13 +283,23 @@ function DashboardContent() {
                         {a.clinicalAction || "—"}
                       </td>
                       <td>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          onClick={(e) => { e.stopPropagation(); handleDownloadReport(a); }}
-                          disabled={downloadingId === a.id}
-                        >
-                          {downloadingId === a.id ? "..." : "📥 PDF"}
-                        </button>
+                        <div style={{ display: "flex", gap: "0.25rem" }}>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => { e.stopPropagation(); handleDownloadReport(a); }}
+                            disabled={downloadingId === a.id}
+                          >
+                            {downloadingId === a.id ? "..." : "📥 PDF"}
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            onClick={(e) => { e.stopPropagation(); handleDeleteAssessment(a.id); }}
+                            title="Delete assessment"
+                            style={{ color: "var(--risk-high)" }}
+                          >
+                            🗑️
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

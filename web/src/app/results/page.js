@@ -9,18 +9,26 @@ import ShapDrivers from "@/components/ShapDrivers";
 import ReportCTA from "@/components/ReportCTA";
 import Footer from "@/components/Footer";
 import { downloadReport } from "@/lib/api";
+import { saveDashboardAssessment } from "@/lib/dashboard-store";
 
 function ResultsContent() {
   const router = useRouter();
   const { user } = useAuth();
   const [result, setResult] = useState(null);
   const [downloading, setDownloading] = useState(false);
+  const [savedToDashboard, setSavedToDashboard] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem("risklens_result");
       if (stored) {
-        setResult(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setResult(parsed);
+        // If assessment was already saved during assess flow, mark it
+        if (parsed.assessmentId) {
+          setSavedToDashboard(true);
+        }
       } else {
         router.push("/assess");
       }
@@ -105,6 +113,40 @@ function ResultsContent() {
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, "_self");
   };
 
+  const handleSaveToDashboard = async () => {
+    if (!user || !result || savedToDashboard) return;
+    setSaving(true);
+    try {
+      const assessmentId = await saveDashboardAssessment(
+        user.uid,
+        {
+          riskScore: result.riskScore,
+          riskLevel: result.riskLevel,
+          clinicalAction: result.clinicalAction,
+          inputs: result.inputs || {},
+          shapValues: result.allShapValues || {},
+          topDrivers: result.topDrivers || [],
+          protectiveFactors: result.protectiveFactors || [],
+        },
+        {
+          name: result.personal?.name || user.displayName || "",
+          email: result.personal?.email || user.email || "",
+          phone: result.personal?.phone || "",
+        }
+      );
+      setSavedToDashboard(true);
+      // Update sessionStorage so re-renders know it's saved
+      const updated = { ...result, assessmentId };
+      sessionStorage.setItem("risklens_result", JSON.stringify(updated));
+      setResult(updated);
+    } catch (error) {
+      console.error("Save to dashboard error:", error);
+      alert("Failed to save to dashboard. Check console for details.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -161,7 +203,21 @@ function ResultsContent() {
 
         {/* Dashboard Upsell for signed-in users */}
         {user && (
-          <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
+          <div style={{ textAlign: "center", marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "0.75rem", alignItems: "center" }}>
+            {!savedToDashboard && (
+              <button
+                className="btn btn-primary"
+                onClick={handleSaveToDashboard}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "💾 Save to My Dashboard"}
+              </button>
+            )}
+            {savedToDashboard && (
+              <p style={{ color: "var(--risk-low)", fontSize: "0.9rem", fontWeight: 600 }}>
+                ✅ Saved to your dashboard
+              </p>
+            )}
             <button
               className="btn btn-secondary"
               onClick={() => router.push("/dashboard")}

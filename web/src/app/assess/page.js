@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import ProgressBar from "@/components/ProgressBar";
 import LoadingAnalysis from "@/components/LoadingAnalysis";
 import { predictRisk } from "@/lib/api";
-import { saveAssessment, saveUserProfile } from "@/lib/firestore";
+import { saveDashboardAssessment } from "@/lib/dashboard-store";
 
 // ── Question definitions (21 BRFSS questions) ─────────────────
 const QUESTIONS = [
@@ -344,24 +344,27 @@ function AssessmentContent() {
 
       const result = await predictRisk(fullAnswers);
 
-      // Save to Firestore if user is logged in
+      // Save to Firestore via dashboard-store
       let assessmentId = null;
       if (user) {
         try {
-          await saveUserProfile(user.uid, {
-            name: personal.name,
-            email: personal.email,
-            phone: personal.phone,
-          });
-          assessmentId = await saveAssessment(user.uid, {
-            riskScore: result.riskScore,
-            riskLevel: result.riskLevel,
-            clinicalAction: result.clinicalAction,
-            inputs: fullAnswers,
-            shapValues: result.allShapValues || {},
-            topDrivers: result.topDrivers || [],
-            protectiveFactors: result.protectiveFactors || [],
-          });
+          assessmentId = await saveDashboardAssessment(
+            user.uid,
+            {
+              riskScore: result.riskScore,
+              riskLevel: result.riskLevel,
+              clinicalAction: result.clinicalAction,
+              inputs: fullAnswers,
+              shapValues: result.allShapValues || {},
+              topDrivers: result.topDrivers || [],
+              protectiveFactors: result.protectiveFactors || [],
+            },
+            {
+              name: personal.name,
+              email: personal.email,
+              phone: personal.phone,
+            }
+          );
         } catch (firebaseError) {
           console.error("Firebase save error:", firebaseError);
           // Continue even if Firebase save fails
