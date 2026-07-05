@@ -34,7 +34,7 @@ export async function saveUserProfile(userId, userData) {
 // ── Assessments Collection (Health Data — Separate from PII) ──
 export async function saveAssessment(userId, assessmentData) {
   if (isDummyConfig) {
-    const list = JSON.parse(localStorage.getItem("risklens_demo_assessments") || "[]");
+    const list = JSON.parse(sessionStorage.getItem("risklens_demo_assessments") || "[]");
     const newId = "demo-" + Date.now();
     const item = {
       id: newId,
@@ -44,7 +44,7 @@ export async function saveAssessment(userId, assessmentData) {
       downloaded: false,
     };
     list.push(item);
-    localStorage.setItem("risklens_demo_assessments", JSON.stringify(list));
+    sessionStorage.setItem("risklens_demo_assessments", JSON.stringify(list));
     return newId;
   }
   const assessmentRef = await addDoc(collection(db, "assessments"), {
@@ -65,7 +65,7 @@ export async function saveAssessment(userId, assessmentData) {
 // ── Get User's Assessment History ─────────────────────────────
 export async function getUserAssessments(userId) {
   if (isDummyConfig) {
-    const list = JSON.parse(localStorage.getItem("risklens_demo_assessments") || "[]");
+    const list = JSON.parse(sessionStorage.getItem("risklens_demo_assessments") || "[]");
     return list
       .filter((item) => item.userId === userId)
       .map((item) => ({ ...item, timestamp: new Date(item.timestamp) }))
@@ -87,7 +87,7 @@ export async function getUserAssessments(userId) {
 // ── Get Single Assessment ─────────────────────────────────────
 export async function getAssessment(assessmentId) {
   if (isDummyConfig) {
-    const list = JSON.parse(localStorage.getItem("risklens_demo_assessments") || "[]");
+    const list = JSON.parse(sessionStorage.getItem("risklens_demo_assessments") || "[]");
     const found = list.find((item) => item.id === assessmentId);
     if (found) return { ...found, timestamp: new Date(found.timestamp) };
     return null;

@@ -250,7 +250,7 @@ function DashboardContent() {
               </button>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
+            <div className="table-scroll-wrapper">
               <table className="history-table">
                 <thead>
                   <tr>
@@ -313,7 +313,7 @@ function DashboardContent() {
               </button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1.5rem" }}>
+            <div className="detail-grid" style={{ marginBottom: "1.5rem" }}>
               <div style={{ textAlign: "center", padding: "1rem", background: "var(--bg-secondary)", borderRadius: "var(--radius-md)" }}>
                 <div style={{ fontSize: "2rem", fontWeight: 700, color: `var(--risk-${getRiskClass(selectedAssessment.riskScore)})`, fontFamily: "var(--font-heading)" }}>
                   {selectedAssessment.riskScore}
@@ -334,7 +334,7 @@ function DashboardContent() {
                 <h4 style={{ fontSize: "0.95rem", marginBottom: "0.75rem", color: "var(--text-secondary)" }}>
                   Health Indicators
                 </h4>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "0.5rem" }}>
+                <div className="health-indicators-grid">
                   {Object.entries(selectedAssessment.inputs).map(([key, value]) => (
                     <div key={key} style={{ display: "flex", justifyContent: "space-between", padding: "0.5rem 0.75rem", background: "var(--bg-secondary)", borderRadius: "var(--radius-sm)", fontSize: "0.85rem" }}>
                       <span style={{ color: "var(--text-tertiary)" }}>{FEATURE_LABELS[key] || key}</span>

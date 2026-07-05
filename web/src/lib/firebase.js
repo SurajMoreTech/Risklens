@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const isDummyConfig =
@@ -23,8 +23,13 @@ let db = null;
 if (!isDummyConfig) {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   auth = getAuth(app);
+  // Use browserLocalPersistence (backed by indexedDB) for maximum
+  // cross-browser reliability. This survives page refreshes and works
+  // even when localStorage/sessionStorage are blocked.
+  setPersistence(auth, browserLocalPersistence).catch((err) => {
+    console.warn("Firebase persistence setup warning:", err);
+  });
   db = getFirestore(app);
 }
 
 export { app, auth, db, isDummyConfig };
-
