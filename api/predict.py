@@ -26,16 +26,6 @@ router = APIRouter(prefix="/api", tags=["prediction"])
 # ---------------------------------------------------------------------------
 # Feature engineering (mirrors src/preprocess.py)
 # ---------------------------------------------------------------------------
-BRFSS_FEATURE_COLUMNS = [
-    "HighBP", "HighChol", "CholCheck", "BMI", "Smoker",
-    "Stroke", "HeartDiseaseorAttack", "PhysActivity",
-    "Fruits", "Veggies", "HvyAlcoholConsump",
-    "AnyHealthcare", "NoDocbcCost", "GenHlth",
-    "MentHlth", "PhysHlth", "DiffWalk", "Sex",
-    "Age", "Education", "Income",
-]
-
-
 def _engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """Add the same composite features created during training."""
     df = df.copy()

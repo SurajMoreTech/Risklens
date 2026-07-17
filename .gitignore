@@ -50,3 +50,6 @@ api/__pycache__/
 # Gemini / IDE agents
 .gemini/
 .agents/
+
+# Personal notes (not for repo)
+interview/

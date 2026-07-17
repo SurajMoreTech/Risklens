@@ -89,18 +89,11 @@ async def download_pdf_report(request: ReportRequest):
 
         logger.info("PDF generated successfully (%d bytes)", len(pdf_bytes))
 
-        # Sanitise filename
-        safe_name = "".join(
-            c if c.isalnum() or c in (" ", "-", "_") else "_"
-            for c in request.patientName
-        ).strip()
-        filename = "risklensreport.pdf"
-
         return StreamingResponse(
             io.BytesIO(pdf_bytes),
             media_type="application/pdf",
             headers={
-                "Content-Disposition": f'attachment; filename="risklensreport.pdf"',
+                "Content-Disposition": 'attachment; filename="risklensreport.pdf"',
                 "Content-Length": str(len(pdf_bytes)),
             },
         )
