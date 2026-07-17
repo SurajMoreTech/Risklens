@@ -13,9 +13,10 @@ from typing import Literal
 
 import numpy as np
 import pandas as pd
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from api.auth import verify_token
 from api.shap_utils import compute_shap
 
 logger = logging.getLogger("risklens.predict")
@@ -99,7 +100,7 @@ class PredictionRequest(BaseModel):
     PhysHlth: float = Field(..., ge=0, le=30, description="Days of poor physical health (past 30)")
     DiffWalk: int = Field(..., ge=0, le=1, description="Serious difficulty walking: 0=No, 1=Yes")
     Sex: int = Field(..., ge=0, le=1, description="Sex: 0=Female, 1=Male")
-    Age: int = Field(..., ge=0, le=13, description="Age category 0-13 (12-17 … 80+)")
+    Age: int = Field(..., ge=1, le=13, description="Age category 1-13 (1=18-24 … 13=80+)")
     Education: int = Field(..., ge=1, le=6, description="Education level 1-6")
     Income: int = Field(..., ge=1, le=8, description="Income level 1-8")
 
@@ -151,7 +152,11 @@ def _clinical_action(risk_level: str) -> str:
 # Endpoint
 # ---------------------------------------------------------------------------
 @router.post("/predict", response_model=PredictionResponse)
-async def predict(request: PredictionRequest, req: Request):
+async def predict(
+    request: PredictionRequest,
+    req: Request,
+    token: dict = Depends(verify_token),
+):
     """Run the diabetes risk prediction pipeline.
 
     Steps:

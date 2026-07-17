@@ -11,11 +11,12 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 import io
 
+from api.auth import verify_token
 from api.pdf_generator import generate_report
 
 logger = logging.getLogger("risklens.report")
@@ -56,7 +57,10 @@ class ReportRequest(BaseModel):
 # Endpoint
 # ---------------------------------------------------------------------------
 @router.post("/report/pdf")
-async def download_pdf_report(request: ReportRequest):
+async def download_pdf_report(
+    request: ReportRequest,
+    token: dict = Depends(verify_token),
+):
     """Generate and return a downloadable PDF report.
 
     Returns:
@@ -65,7 +69,8 @@ async def download_pdf_report(request: ReportRequest):
     """
     try:
         logger.info(
-            "Generating PDF report for patient=%s risk=%d/%s",
+            "Generating PDF report for uid=%s patient=%s risk=%d/%s",
+            token.get("uid", "unknown"),
             request.patientName,
             request.riskScore,
             request.riskLevel,
@@ -89,11 +94,18 @@ async def download_pdf_report(request: ReportRequest):
 
         logger.info("PDF generated successfully (%d bytes)", len(pdf_bytes))
 
+        # Sanitise patient name for use in the download filename
+        safe_name = "".join(
+            c if c.isalnum() or c in (" ", "-", "_") else ""
+            for c in request.patientName
+        ).strip().replace(" ", "_") or "patient"
+        filename = f"risklens_{safe_name}.pdf"
+
         return StreamingResponse(
             io.BytesIO(pdf_bytes),
             media_type="application/pdf",
             headers={
-                "Content-Disposition": 'attachment; filename="risklensreport.pdf"',
+                "Content-Disposition": f'attachment; filename="{filename}"',
                 "Content-Length": str(len(pdf_bytes)),
             },
         )
