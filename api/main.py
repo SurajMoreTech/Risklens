@@ -106,6 +106,9 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Browsers hide non-safelisted response headers from cross-origin JS unless
+    # they are explicitly exposed — required for the personalised PDF filename.
+    expose_headers=["Content-Disposition", "Content-Length"],
 )
 
 # ---------------------------------------------------------------------------

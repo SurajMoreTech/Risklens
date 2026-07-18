@@ -53,3 +53,11 @@ api/__pycache__/
 
 # Personal notes (not for repo)
 interview/
+
+# Firebase service-account keys (secrets — never commit)
+*service-account*.json
+*serviceAccount*.json
+*firebase-adminsdk*.json
+
+# Scratch files
+temp_diff.patch

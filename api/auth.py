@@ -18,6 +18,11 @@ FIREBASE_SERVICE_ACCOUNT_JSON
 
     On Render, set this as a secret environment variable (not committed to git).
 
+FIREBASE_SERVICE_ACCOUNT_FILE
+    Alternative for local development: a path to the service-account JSON key
+    file on disk.  Checked only when FIREBASE_SERVICE_ACCOUNT_JSON is unset.
+    Keep the key file outside the repo (it is git-ignored either way).
+
 If the variable is absent the app still starts, but every protected endpoint
 returns HTTP 503 ("Auth not configured") until the variable is set.  This lets
 local development without credentials continue working on unprotected endpoints
@@ -44,6 +49,15 @@ _firebase_app: firebase_admin.App | None = None
 _init_error: str | None = None
 
 _SERVICE_ACCOUNT_JSON = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON", "")
+_SERVICE_ACCOUNT_FILE = os.environ.get("FIREBASE_SERVICE_ACCOUNT_FILE", "")
+
+if not _SERVICE_ACCOUNT_JSON and _SERVICE_ACCOUNT_FILE:
+    try:
+        with open(_SERVICE_ACCOUNT_FILE, encoding="utf-8") as fh:
+            _SERVICE_ACCOUNT_JSON = fh.read()
+    except OSError as exc:
+        _init_error = f"Could not read FIREBASE_SERVICE_ACCOUNT_FILE: {exc}"
+        logger.error(_init_error)
 
 if _SERVICE_ACCOUNT_JSON:
     try:
@@ -54,9 +68,9 @@ if _SERVICE_ACCOUNT_JSON:
         _init_error = f"Firebase Admin SDK failed to initialise: {exc}"
         logger.error(_init_error)
 else:
-    _init_error = (
-        "FIREBASE_SERVICE_ACCOUNT_JSON env var not set — "
-        "protected endpoints will return HTTP 503."
+    _init_error = _init_error or (
+        "Neither FIREBASE_SERVICE_ACCOUNT_JSON nor FIREBASE_SERVICE_ACCOUNT_FILE "
+        "is set — protected endpoints will return HTTP 503."
     )
     logger.warning(_init_error)
 
