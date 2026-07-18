@@ -237,7 +237,7 @@ function ConsentStep({ consented, onChange, onPredict, loading }) {
 // ── Main Assessment Page ──────────────────────────────────────
 function AssessmentContent() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
 
   // Step: "personal" | "questions" | "consent" | "loading"
   const [step, setStep] = useState("personal");
@@ -336,6 +336,19 @@ function AssessmentContent() {
   const handlePredict = useCallback(async () => {
     apiDoneRef.current = false;
     animDoneRef.current = false;
+
+    // Ensure the user is signed in so we can send a valid Firebase auth token.
+    // If not yet logged in, trigger Google sign-in before proceeding.
+    if (!user) {
+      try {
+        const signedInUser = await signInWithGoogle();
+        if (!signedInUser) return; // user cancelled the popup
+      } catch (signInError) {
+        alert("Sign-in is required to get a prediction. Please try again.");
+        return;
+      }
+    }
+
     setLoading(true);
     setStep("loading");
 
@@ -407,7 +420,7 @@ function AssessmentContent() {
       setLoading(false);
       return;
     }
-  }, [answers, personal, user, tryNavigate]);
+  }, [answers, personal, user, signInWithGoogle, tryNavigate]);
 
   const handleLoadingComplete = useCallback(() => {
     // Mark animation as done and try to navigate
