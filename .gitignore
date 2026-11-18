@@ -62,9 +62,6 @@ interview/
 # Scratch files
 temp_diff.patch
 
-# Trained model binaries (regenerate via train_model.py)
-models/*.pkl
-
 # Internal / agent files
 handoff.md
 web/AGENTS.md
