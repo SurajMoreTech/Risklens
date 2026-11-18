@@ -14,7 +14,7 @@ from __future__ import annotations
 import io
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any
 
 import qrcode
@@ -305,7 +305,8 @@ def generate_report(
     bytes – PDF content
     """
     report_id = str(uuid.uuid4())[:12].upper()
-    generated_at = datetime.now(timezone.utc).strftime("%B %d, %Y at %H:%M UTC")
+    IST = timezone(timedelta(hours=5, minutes=30))
+    generated_at = datetime.now(IST).strftime("%B %d, %Y at %I:%M %p IST")
     styles = _build_styles()
 
     buf = io.BytesIO()
