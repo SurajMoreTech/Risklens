@@ -8,15 +8,9 @@ const isDummyConfig =
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "dummy_key",
-  // Use the current browser host as the authDomain so the /__/auth handlers
-  // stay same-origin (next.config.mjs rewrites them to Firebase). This works
-  // on localhost:3000 and on the deployed domain alike, and avoids the
-  // cross-origin storage partitioning that breaks desktop redirect sign-in.
-  // During SSR there is no window — fall back to the configured domain.
-  authDomain:
-    typeof window !== "undefined" && window.location.hostname
-      ? window.location.hostname
-      : process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
+  // Must match the Firebase project's authDomain (e.g. risklens-eb4fo.firebaseapp.com).
+  // Google OAuth redirects are registered against this domain in the Google Cloud Console.
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dummy.firebaseapp.com",
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dummy-project",
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "dummy.appspot.com",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "123456789",
