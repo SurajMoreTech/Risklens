@@ -1,0 +1,10 @@
+.tip{position:relative;display:inline-block;margin-left:.45rem;vertical-align:middle;line-height:1}
+.tip-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;padding:0;border:1.5px solid currentColor;border-radius:50%;background:transparent;color:var(--rl-muted,#4B5E67);font:italic 700 .82rem/1 Georgia,"Times New Roman",serif;cursor:pointer}
+.tip-btn::after{content:"";position:absolute;inset:-11px}
+.tip-btn:hover,.tip-btn[aria-expanded="true"]{color:var(--rl-ink,#13222C);background:rgba(15,118,110,.12)}
+.tip-btn:focus-visible{outline:3px solid var(--rl-ink,#13222C);outline-offset:3px}
+.tip-pop{position:absolute;z-index:30;top:calc(100% + 10px);width:min(300px,calc(100vw - 3rem));padding:.9rem 1rem;background:var(--rl-surface,#fff);color:var(--rl-ink,#13222C);border:1px solid var(--rl-ink,#13222C);border-radius:6px;box-shadow:0 8px 24px rgba(19,34,44,.18);font:400 .92rem/1.5 var(--font-body,system-ui,sans-serif);font-style:normal;letter-spacing:0;text-transform:none;text-align:left}
+.tip-pop strong{display:block;margin-bottom:.25rem;font-weight:700}
+.tip-start{left:0}
+.tip-end{right:0}
+@media (max-width:640px){.tip-pop{position:fixed;top:auto;left:1rem;right:1rem;bottom:1rem;width:auto}}

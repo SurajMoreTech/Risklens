@@ -1,0 +1,120 @@
+/* RiskLens site-wide theme. Loaded after globals.css and re-skins the existing class names,
+   so assess, results, dashboard and navbar change without touching their markup. */
+:root{
+  --rl-ink:#13222C;--rl-paper:#F4F7F6;--rl-surface:#FFFFFF;--rl-rule:#C5D1CD;--rl-muted:#4B5E67;
+  --rl-brand:#0F766E;--rl-brand-text:#0F766E;
+  --bg-primary:var(--rl-paper);--bg-secondary:var(--rl-surface);--bg-tertiary:var(--rl-paper);--bg-card:var(--rl-surface);--bg-overlay:var(--rl-paper);
+  --text-primary:var(--rl-ink);--text-secondary:var(--rl-ink);--text-tertiary:var(--rl-muted);--text-muted:var(--rl-muted);
+  --accent-teal:var(--rl-brand-text);--accent-teal-dark:var(--rl-brand);--accent-teal-darker:var(--rl-brand);--accent-teal-light:var(--rl-brand-text);
+  --accent-teal-bg:rgba(15,118,110,.09);--accent-teal-bg-hover:rgba(15,118,110,.15);
+  --risk-low:#2F7F5C;--risk-low-bg:rgba(47,127,92,.12);
+  --risk-moderate:#A86F00;--risk-moderate-bg:rgba(227,167,47,.18);
+  --risk-high:#C2432F;--risk-high-bg:rgba(194,67,47,.12);
+  --border-light:var(--rl-rule);--border-medium:var(--rl-rule);
+  --shadow-sm:none;--shadow-md:0 1px 2px rgba(19,34,44,.08);--shadow-lg:0 4px 12px rgba(19,34,44,.1);--shadow-xl:0 8px 24px rgba(19,34,44,.12);--shadow-teal:none;
+  --font-heading:var(--font-display),"Bricolage Grotesque",system-ui,sans-serif;
+  --font-body:var(--font-text),"Public Sans",system-ui,sans-serif;
+  --radius-sm:4px;--radius-md:6px;--radius-lg:8px;--radius-xl:10px;
+  --chart-track:#DFE7E4;
+  color-scheme:light;
+}
+/* Dark palette — applied when the visitor picks Dark, or (unless they picked
+   Light) when the OS prefers dark. Mirrors the data-theme logic in landing.css. */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --rl-ink:#E8EFEC;--rl-paper:#0F1A20;--rl-surface:#16252D;--rl-rule:#2C3E46;--rl-muted:#9DB0B8;--rl-brand-text:#5EEAD4;
+  --risk-low:#5CC49A;--risk-moderate:#E3A72F;--risk-high:#F08A76;
+  --chart-track:#26363E;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --rl-ink:#E8EFEC;--rl-paper:#0F1A20;--rl-surface:#16252D;--rl-rule:#2C3E46;--rl-muted:#9DB0B8;--rl-brand-text:#5EEAD4;
+  --risk-low:#5CC49A;--risk-moderate:#E3A72F;--risk-high:#F08A76;
+  --chart-track:#26363E;
+  color-scheme:dark;
+}
+html{-webkit-text-size-adjust:100%}
+body{font-family:var(--font-body)}
+h1,h2,h3,h4{letter-spacing:-.02em}
+img,svg,canvas{max-width:100%}
+
+/* nav: colors only — the logo/wordmark markup lives in Navbar.js */
+.navbar{background:var(--rl-paper);border-bottom:1px solid var(--rl-rule);-webkit-backdrop-filter:none;backdrop-filter:none}
+.navbar.scrolled{box-shadow:none}
+.navbar-logo{color:var(--rl-brand-text)}
+.navbar-mobile-menu{background:var(--rl-paper)}
+.footer{background:var(--rl-paper);border-top:1px solid var(--rl-rule)}
+.footer-disclaimer{color:var(--rl-muted)}
+
+/* buttons and cards */
+.btn{border-radius:6px;font-weight:600;min-height:44px}
+.btn-primary{background:var(--rl-brand);color:#fff;border:1px solid var(--rl-brand);box-shadow:none}
+.btn-primary:hover{background:#0B5F58;box-shadow:none;transform:none}
+.btn-secondary{background:transparent;color:var(--rl-ink);border:1px solid var(--rl-ink)}
+.btn-secondary:hover{background:var(--accent-teal-bg)}
+.btn-google{background:var(--rl-surface);color:var(--rl-ink);border:1px solid var(--rl-rule)}
+.card{background:var(--rl-surface);border:1px solid var(--rl-rule);box-shadow:none}
+.card:hover{box-shadow:none;transform:none}
+
+/* assessment form */
+.form-card{background:var(--rl-surface);border:1px solid var(--rl-rule);box-shadow:none}
+.form-input,.form-select,.question-number-input input{background:var(--rl-surface);color:var(--rl-ink);border:1px solid var(--rl-rule);border-radius:6px;font-size:16px}
+.question-number-input input{border-width:2px}
+.form-input:focus,.form-select:focus{border-color:var(--rl-brand-text);box-shadow:0 0 0 3px rgba(15,118,110,.2)}
+.form-input::placeholder{color:var(--rl-muted);opacity:.7}
+.form-error{color:var(--risk-high)}
+.form-footer{border-top:1px solid var(--rl-rule)}
+.question-category{text-transform:none;letter-spacing:0;font-size:.9rem}
+.option-btn{background:var(--rl-surface);color:var(--rl-ink);border:2px solid var(--rl-rule);border-radius:6px;min-height:44px}
+.option-btn:hover{background:var(--accent-teal-bg)}
+.option-btn.selected{background:var(--accent-teal-bg);border-color:var(--rl-brand-text)}
+.option-indicator{border:2px solid var(--rl-rule)}
+.option-btn.selected .option-indicator{box-shadow:inset 0 0 0 3px var(--rl-surface)}
+.progress-bar{background:var(--rl-rule)}
+.progress-fill{background:var(--rl-brand)}
+
+/* results */
+.gauge-container svg{filter:none!important}
+.clinical-action.low{background:var(--risk-low-bg);border-left:4px solid var(--risk-low)}
+.clinical-action.moderate{background:var(--risk-moderate-bg);border-left:4px solid var(--risk-moderate)}
+.clinical-action.high{background:var(--risk-high-bg);border-left:4px solid var(--risk-high)}
+.clinical-action.low h4,.clinical-action.low p,.clinical-action.moderate h4,.clinical-action.moderate p,.clinical-action.high h4,.clinical-action.high p{color:var(--rl-ink)}
+.shap-driver{background:var(--rl-surface);border:1px solid var(--rl-rule)}
+.shap-driver-icon.positive{background:var(--risk-high-bg);color:var(--risk-high)}
+.shap-driver-impact.positive{color:var(--risk-high)}
+.report-cta{background:var(--rl-surface);border:1px solid var(--rl-rule)}
+
+/* dashboard */
+.stat-card{background:var(--rl-surface);border:1px solid var(--rl-rule)}
+.profile-header-card{background:var(--rl-surface);border:1px solid var(--rl-rule)}
+.profile-form-card .form-input{background:var(--rl-surface);border-color:var(--rl-rule)}
+.improvement-msg.worsened p{color:var(--rl-ink)}
+
+@media (min-width:1600px){:root{--container-max:1280px}}
+.shap-section h4{text-transform:none!important;letter-spacing:0!important}
+
+/* ── Light/Dark toggle ───────────────────────────────────────
+   Which icon shows is decided by CSS against the live theme, so the
+   button never drifts out of sync (and never causes hydration issues). */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;padding:0;flex:none;border:1px solid var(--rl-rule);border-radius:50%;background:var(--rl-surface);color:var(--rl-ink);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.theme-toggle:hover{background:var(--accent-teal-bg);border-color:var(--rl-brand-text)}
+.theme-toggle:focus-visible{outline:3px solid var(--rl-brand-text);outline-offset:2px}
+.theme-toggle .icon-sun{display:none}
+.theme-toggle .icon-moon{display:block}
+:root[data-theme="dark"] .theme-toggle .icon-sun{display:block}
+:root[data-theme="dark"] .theme-toggle .icon-moon{display:none}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .theme-toggle .icon-sun{display:block}
+  :root:not([data-theme="light"]) .theme-toggle .icon-moon{display:none}
+}
+/* Mobile slide-out menu: toggle sits at the top, right-aligned */
+.navbar-mobile-theme{display:flex;justify-content:flex-end;padding:1rem 1.5rem .25rem}
+
+/* ── Brand wordmark (Navbar + Footer) ──────────────────────── */
+.logo-mark{display:inline-flex;width:32px;height:32px;flex:none}
+.logo-mark svg{width:100%;height:100%;display:block}
+.logo-word{font-weight:700;letter-spacing:-.02em}
+.logo-word .logo-accent{color:var(--rl-brand-text);font-weight:800}
+.footer-logo{display:flex;align-items:center;gap:.5rem}
+
+/* ── Charts: gauge track needs more contrast than the page tint ── */
+.gauge-container svg path[stroke="var(--bg-tertiary)"]{stroke:var(--chart-track)}
